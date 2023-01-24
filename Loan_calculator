@@ -1,0 +1,79 @@
+#Loan Calculatior with Differentiated and Annuity Payments used with command line interface 
+import math
+import argparse
+
+
+def type_rule (string): # function to ensure that diff calculation is diff or annuity
+    if string !='diff' and string !='annuity':
+       # raise argparse.ArgumentTypeError('Incorrect parameters')
+        print('Incorrect parameters')
+    return string
+
+def neg_rule (string): # ensures that values is not negative
+    value = float(string)
+    if value < 0:
+        print('Incorrect parameters')
+        # raise argparse.ArgumentTypeError('Incorrect parameters')
+    return value
+
+def interest_rule (string): # ensures that interests is used/complete and has a float possible
+    value =float(string)
+    if string is None or float(string) < 0:
+        # raise argparse.ArgumentTypeError('Incorrect parameters')
+        print('Incorrect parameters')
+    return value
+
+parser = argparse.ArgumentParser(description="Would you like to calculate monthly Differentiated payments or Annuity payments  ?.Input --type=diff type=annuity" )
+parser.add_argument('--type', type=type_rule )
+parser.add_argument('--principal', type=neg_rule)
+parser.add_argument('--interest', type=interest_rule)
+parser.add_argument('--payment', type=neg_rule)
+parser.add_argument('--periods', type=interest_rule)
+args = parser.parse_args()
+args_count = [args.type, args.principal, args.interest, args.payment, args.periods]
+if len(list(filter(None, args_count))) != 4:
+    print('Incorrect parameters')
+    #  parser.error('-p is required when -w is set.')
+elif args.type == 'diff' and args.payment is not None:
+    print('Incorrect parameters')
+    #  parser.error('-p is required when -w is set.')
+else:
+    int_cal = float((args.interest / 100) / 12)
+    if args.type == 'diff' : # calculation for differentiation payments
+        i = 1
+        total_payment: int = 0
+        for i in range(1,int(args.periods)+1):
+            diff_pay = math.ceil((args.principal / args.periods) + int_cal * (args.principal - (args.principal * (i-1))/ args.periods))
+            total_payment += diff_pay
+            print(f'Month {i}: payment is {diff_pay}')
+        over_payment = int(total_payment - args.principal)
+        print(f'Overpayment = {over_payment}')
+    # monthly payments for Annuity
+    elif args.type == 'annuity' and args.principal is not None and args.periods is not None and args.interest is not None:
+        monthly_pay = math.ceil(args.principal * ((int_cal * math.pow(1 + int_cal, args.periods)) /
+                                          (math.pow(1 + int_cal, args.periods) - 1)))
+        over_payment = round((monthly_pay * args.periods) - args.principal)
+        print(f'Your annuity payment = {monthly_pay}!')
+        print(f'Overpayment = {over_payment}')
+    # Principtal Calculation for Annuity    
+    elif args.type == 'annuity' and args.payment is not None and args.periods is not None and args.interest is not None:
+        loan_p = math.floor(args.payment / ((int_cal * math.pow(1 + int_cal, args.periods)) /
+                                (math.pow(1 + int_cal, args.periods) - 1)))
+        over_payment = round((args.payment * args.periods ) - loan_p)
+        print(f'Your annuity payment = {loan_p}!')
+        print(f'Overpayment = {over_payment}')
+    # Calculates Number of Months or Years to Pay Annuity Loan    
+    elif args.type == 'annuity' and args.principal is not None and args.payment is not None and args.interest is not None:
+        x_2 = (args.payment / (args.payment - int_cal * args.principal))
+        number_of_months = math.ceil(math.log(x_2, 1 + int_cal))
+        number_in_years = math.floor(number_of_months / 12)
+        remaining_months = math.ceil((number_of_months % 12))
+        over_payment = round((args.payment * number_of_months) - args.principal)
+        if remaining_months > 0:
+            print(f'It will take {number_in_years} years and {remaining_months} months to repay this loan!')
+            printprint(f'Overpayment = {over_payment}')
+        else:
+            print(f'It will take {number_in_years} years to repay the loan!')
+            print(f'Overpayment = {over_payment}')
+    else:
+        print('Wrong Combination Inputted')
