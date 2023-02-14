@@ -1,0 +1,32 @@
+# Query to import different tax rates
+import requests
+import json
+curr_own = str(input()).lower()
+exc_rate = requests.get(f'http://www.floatrates.com/daily/{curr_own}.json')
+dict_exc = json.loads(exc_rate.text)
+cached_rates = {}
+if curr_own != 'usd':
+    cached_rates['usd'] = dict_exc['usd']['rate']
+if curr_own != 'eur':
+    cached_rates['eur'] = dict_exc['eur']['rate']
+# loop start
+while True:
+    curr_inpt2 = str(input().lower())
+    if curr_inpt2 is None or curr_inpt2 == '':
+        break
+    amt_exc = float(input())
+    print('Checking the cache...')
+    if curr_inpt2 in cached_rates:
+        exchange_amount = round(cached_rates[curr_inpt2] * amt_exc,2)
+        print('Oh! It is in the cache!')
+        print(f'You received {exchange_amount} {curr_inpt2.upper()}.')
+    elif curr_inpt2 not in cached_rates:
+        exc_rate = requests.get(f'http://www.floatrates.com/daily/{curr_own}.json')
+        dict_exc = json.loads(exc_rate.text)
+        if curr_inpt2 not in dict_exc:
+            break
+        else:
+            cached_rates[curr_inpt2] = dict_exc[curr_inpt2]['rate']
+            exchange_amount = round(cached_rates[curr_inpt2] * amt_exc,2)
+            print('Sorry, but it is not in the cache!')
+            print(f'You received {exchange_amount} {curr_inpt2.upper()}.')
