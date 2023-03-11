@@ -1,0 +1,54 @@
+import random
+
+class guests:
+    def __init__(self,no_guests,guest_list):
+        self.no_guests = no_guests
+        self.guest_list = guest_list
+
+    def div_amount(self,bill_amount):
+        return  round(bill_amount/ self.no_guests, 2)
+
+    def div_amount_lucky(self,bill_amount):
+        return round(bill_amount/ (self.no_guests -1), 2)
+
+    def new_list(self,new_div_amount):
+        return dict.fromkeys(guest_list,new_div_amount)
+
+print('Enter the number of friends joining (including you):')
+try:
+    no_guests = int(input())
+    guest_list = {}
+    if no_guests <= 0:
+        raise ValueError
+    else:
+       print('Enter the name of every friend (including you), each on a new line:')
+       for _ in range(no_guests):
+           guest_name = str(input())
+           guest_list[guest_name] = guest_list
+       print('Enter the total bill value:')
+       try:
+           bill_amount = float(input())
+           print('Do you want to use the "Who is lucky?" feature? Write Yes/No:')
+           user_yn = str(input())
+           if user_yn == 'Yes':
+                name = random.choice(list(guest_list))
+                no_guests_class = guests(no_guests, guest_list)
+                div_amount = no_guests_class.div_amount_lucky(bill_amount)
+                new_dict = no_guests_class.new_list(div_amount)
+                new_dict[name] = 0
+                print(f'{name} is the lukcy one!')
+                print('')
+                print (new_dict)
+           elif user_yn == 'No':
+                no_guests_class = guests(no_guests, guest_list)
+                div_amount = no_guests_class.div_amount(bill_amount)
+                new_dict = no_guests_class.new_list(div_amount)
+                print('No one is going to be lucky')
+                print('')
+                print(new_dict)
+           else:
+                print('Incorrect Input')
+       except ValueError:
+            print('Bill Amount Incorrect ')
+except ValueError:
+    print('No one is joining for the party')
